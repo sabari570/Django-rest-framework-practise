@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Product
 from .permissions import IsStaffEditorPermission
+from api.authentication import BearerTokenAuthentication
 
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
@@ -14,7 +15,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     # custom queryset by actually overriding the get_queryset() function
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [BearerTokenAuthentication]
     # Ordering of permissions matter which permission is written first must be satisfied inorder to go to the next
     permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     # This lookup_field actually looks for that provided field in the db to fetch the data
@@ -33,7 +34,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     # The authentication_classes are added inorder to make this APIView authenticated
     # such that only authenticated users can access it, it also says what type of authentication are we using
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [BearerTokenAuthentication]
 
     # Now the permission_classes indicates the permission that the corresponding user has who hit the API
     # If the user has permission to view the products and create them then they can actually do that once authenticated
@@ -54,6 +55,8 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
     '''
      * This API is used to update a product detail by id
     '''
+    authentication_classes = [BearerTokenAuthentication]
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
@@ -71,6 +74,8 @@ class ProductDeleteAPIView(generics.DestroyAPIView):
     '''
      * This API is used to delete a product detail by id
     '''
+    authentication_classes = [BearerTokenAuthentication]
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
