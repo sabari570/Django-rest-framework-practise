@@ -1,8 +1,9 @@
 from .serializers import ProductSerializer
-from rest_framework import generics
+from rest_framework import generics, authentication, permissions
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Product
+from .permissions import IsStaffEditorPermission
 
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
@@ -13,6 +14,9 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     # custom queryset by actually overriding the get_queryset() function
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    # Ordering of permissions matter which permission is written first must be satisfied inorder to go to the next
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     # This lookup_field actually looks for that provided field in the db to fetch the data
     # Here it looks for the pk -> primary key in the db and fetches the data
     # lookup_field = 'pk' -> generates a queryset like Product.objects.get(pk=1)
@@ -27,6 +31,14 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     '''
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    # The authentication_classes are added inorder to make this APIView authenticated
+    # such that only authenticated users can access it, it also says what type of authentication are we using
+    authentication_classes = [authentication.SessionAuthentication]
+
+    # Now the permission_classes indicates the permission that the corresponding user has who hit the API
+    # If the user has permission to view the products and create them then they can actually do that once authenticated
+    # If the user has no permission to view or create a product then he cannot do anything with this API
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
     # This is a default function that is used while creation of a product inroder to customize to our needs
     # This function will be executed when we hit a POST request for the given URL else it just lists out all the products created
