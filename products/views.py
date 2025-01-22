@@ -1,13 +1,12 @@
-from .serializers import ProductSerializer
-from rest_framework import generics, authentication, permissions
+from .serializers import ProductSerializer  # relative imports
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Product
-from .permissions import IsStaffEditorPermission
-from api.authentication import BearerTokenAuthentication
+from api.mixins import StaffEditorPermissionMixin  # absolute imports
 
-
-class ProductDetailAPIView(generics.RetrieveAPIView):
+# Remember to add the permission mixin before the generics API view while inheriting in the class else it wont work
+class ProductDetailAPIView(StaffEditorPermissionMixin, generics.RetrieveAPIView):
     '''
      * DetailView actually gets the detail of one single item
     '''
@@ -15,9 +14,7 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
     # custom queryset by actually overriding the get_queryset() function
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    authentication_classes = [BearerTokenAuthentication]
-    # Ordering of permissions matter which permission is written first must be satisfied inorder to go to the next
-    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
+    # The authentication class is already provided in the settings of the project by default if we need to add extra authentication then fill the list with that
     # This lookup_field actually looks for that provided field in the db to fetch the data
     # Here it looks for the pk -> primary key in the db and fetches the data
     # lookup_field = 'pk' -> generates a queryset like Product.objects.get(pk=1)
@@ -25,21 +22,13 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 # This view is used to list all the products and also to create a product
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
     '''
      * GET - Used to List out all the products created all at once.
      * POST - Used to create a product
     '''
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    # The authentication_classes are added inorder to make this APIView authenticated
-    # such that only authenticated users can access it, it also says what type of authentication are we using
-    authentication_classes = [BearerTokenAuthentication]
-
-    # Now the permission_classes indicates the permission that the corresponding user has who hit the API
-    # If the user has permission to view the products and create them then they can actually do that once authenticated
-    # If the user has no permission to view or create a product then he cannot do anything with this API
-    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
     # This is a default function that is used while creation of a product inroder to customize to our needs
     # This function will be executed when we hit a POST request for the given URL else it just lists out all the products created
@@ -51,12 +40,10 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         serializer.save(content=content)
 
 
-class ProductUpdateAPIView(generics.UpdateAPIView):
+class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):
     '''
      * This API is used to update a product detail by id
     '''
-    authentication_classes = [BearerTokenAuthentication]
-    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
@@ -70,12 +57,10 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
             instance.content = instance.title
 
 
-class ProductDeleteAPIView(generics.DestroyAPIView):
+class ProductDeleteAPIView(StaffEditorPermissionMixin, generics.DestroyAPIView):
     '''
      * This API is used to delete a product detail by id
     '''
-    authentication_classes = [BearerTokenAuthentication]
-    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'

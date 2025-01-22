@@ -125,3 +125,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# This is added inorder to provide a default authentication and permission class for all the api views we create
+# we can customize them in the respective views if any change is needed
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        # Custom authentication class we created
+        "api.authentication.BearerTokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        # Allows only authenticated users to perform a POST, PUT, PATCH or DELETE request
+        # Non authenticated users can only read that is hit a GET request
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+    ]
+}
