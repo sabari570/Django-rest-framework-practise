@@ -12,6 +12,7 @@
 /dist/
 /*.egg-info/
 /env/
+practise_env
 MANIFEST
 coverage.*
 

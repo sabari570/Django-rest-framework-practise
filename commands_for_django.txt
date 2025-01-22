@@ -5,6 +5,10 @@
 * Command for migrating the changes: python3 manage.py migrate
 * Command for creating a superuser in django: python3 manage.py createsuperuser (Enter username, email and password)
 
+* Command to create a new virtual env: python -m venv env_name
+* Command to activate the created venv: source env_name/bin/activate or in windows (env_name\Scripts\activate)
+* To deactivate the venv just type: deactivate inside the venv terminal
+
 
 WHILE PUSHING THE CODE TO GITHUB USE THIS COMMAND:
 	=> git push https://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@github.com/sabari570/Django-rest-framework-practise.git <branch name>
