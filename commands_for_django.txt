@@ -1,0 +1,13 @@
+* Command to create a django project: django-admin startproject <project_name> .
+* Command to create a django app within the project: cd into the project and then python3 manage.py startapp <app_name>
+* Command to start running the server: python3 manage.py runserver <PORT>
+* Command for making migrations into the database: python3 manage.py makemigrations
+* Command for migrating the changes: python3 manage.py migrate
+* Command for creating a superuser in django: python3 manage.py createsuperuser (Enter username, email and password)
+
+
+WHILE PUSHING THE CODE TO GITHUB USE THIS COMMAND:
+	=> git push https://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@github.com/sabari570/Django-rest-framework-practise.git <branch name>
+	
+	=> command to pull the code from a branch using access token: 
+	git push https://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@github.com/sabari570/Django-rest-framework-practise.git <branch name>
