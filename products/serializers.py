@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 from .models import Product
+from .validators import validate_title, unique_product_title
 
 # Here we define a serializer for the Product model that actually serializers and provides validation to the data
 
@@ -23,10 +24,27 @@ class ProductSerializer(serializers.ModelSerializer):
         # lookup_url_kwarg='pkk' -> If the url params is having any other kwargs other than pk then configure it like this ->
     )
 
+    # Other way of adding a custom validation is this
+    # This is how we add multiple validators to a field in the serializer before saving it to DB
+    title = serializers.CharField(
+        validators=[validate_title, unique_product_title])
+
     class Meta:
         model = Product
         fields = ['id', 'url', 'edit_url', 'title', 'content',
                   'price', 'sale_price', 'my_discount']
+
+    # Customized validation function for serialzier fields
+    # if you need to validate the title field of a serializer before saving it to the DB
+    # This is the format of the function validate_<field-name-to-validate>(self, value)
+    def validate_title(self, value):
+        # This is a queryset which is used to fetch the products that matches with the title we provided
+        # iexact means it is case insensitive
+        qs = Product.objects.filter(title__iexact=value)
+        if qs.exists():
+            raise serializers.ValidationError(
+                f"{value} is already a product name")
+        return value
 
     # If you need to update any field before saving it to the database while creating or updating a record
     # customize the create or update function in the serializer
