@@ -37,6 +37,18 @@ class ProductSerializer(serializers.ModelSerializer):
             validated_data['content'] = title
         return super().create(validated_data)
 
+    # Customized update function
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.content = validated_data.get('content', instance.content)
+
+        # If existing content is empty then
+        if not instance.content:
+            # If the saved data didnt have the content in it then we update the content with the title text
+            instance.content = instance.title
+        instance.save()
+        return instance
+
     # Now define the function that actually decides what value must be returned to the edit_url field
     def get_edit_url(self, obj):
         # this is how you access the request object in a serializer

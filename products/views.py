@@ -46,14 +46,6 @@ class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):
     serializer_class = ProductSerializer
     lookup_field = "pk"
 
-    def perform_update(self, serializer):
-        # The serializer.save() will perform the update using the validated data from the request,
-        # and the instance variable will refer to the updated Product object that was just saved to the database.
-        instance = serializer.save()
-        if not instance.content:
-            # If the saved data didnt have the content in it then we update the content with the title text
-            instance.content = instance.title
-
 
 class ProductDeleteAPIView(StaffEditorPermissionMixin, generics.DestroyAPIView):
     """
