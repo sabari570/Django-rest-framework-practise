@@ -19,7 +19,9 @@ class ProductDetailAPIView(StaffEditorPermissionMixin, generics.RetrieveAPIView)
     # The authentication class is already provided in the settings of the project by default if we need to add extra authentication then fill the list with that
     # This lookup_field actually looks for that provided field in the db to fetch the data
     # Here it looks for the pk -> primary key in the db and fetches the data
-    # lookup_field = 'pk' -> generates a queryset like Product.objects.get(pk=1)
+    # If the url params is having any other kwargs other than pk then configure it like this ->
+    # lookup_field = 'pk' # -> generates a queryset like Product.objects.get(pk=1)
+    # lookup_url_kwarg = 'pkk'
 
 
 # This view is used to list all the products and also to create a product
@@ -33,15 +35,6 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAP
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-    # This is a default function that is used while creation of a product inroder to customize to our needs
-    # This function will be executed when we hit a POST request for the given URL else it just lists out all the products created
-    def perform_create(self, serializer):
-        title = serializer.validated_data.get("title")
-        content = serializer.validated_data.get("content") or None
-        if content is None:
-            content = title
-        serializer.save(content=content)
 
 
 class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):
