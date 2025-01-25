@@ -2,11 +2,16 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from .models import Product
 from .validators import validate_title, unique_product_title
+from api.serializers import UserPublicSerialzer
 
 # Here we define a serializer for the Product model that actually serializers and provides validation to the data
 
 
 class ProductSerializer(serializers.ModelSerializer):
+    # Suppose we want to include a field called owner which shows some of the details of the owner of that product
+    # this is how we achieve it
+    # Here we mention the source because it is from the source we actually get the data, that is here it is the user
+    owner = UserPublicSerialzer(source="user", read_only=True)
     # This field is actually created inorder to serialize a function that is created in our model
     # SerializerMethodField is used to include a custom field in the serialized output that is calculated dynamically.
     # The function associated with this field defines how its value is computed.
@@ -40,6 +45,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "price",
             "sale_price",
             "my_discount",
+            "owner",
         ]
 
     # Customized validation function for serialzier fields
