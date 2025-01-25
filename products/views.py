@@ -3,7 +3,7 @@ from rest_framework import generics, mixins
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Product
-from api.mixins import StaffEditorPermissionMixin  # absolute imports
+from api.mixins import StaffEditorPermissionMixin, UserQuerySetMixin  # absolute imports
 
 
 # Remember to add the permission mixin before the generics API view while inheriting in the class else it wont work
@@ -27,7 +27,12 @@ class ProductDetailAPIView(StaffEditorPermissionMixin, generics.RetrieveAPIView)
 # This view is used to list all the products and also to create a product
 
 
-class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAPIView):
+class ProductListCreateAPIView(
+    # Always place the mixins before the generics view
+    StaffEditorPermissionMixin,
+    UserQuerySetMixin,
+    generics.ListCreateAPIView,
+):
     """
     * GET - Used to List out all the products created all at once.
     * POST - Used to create a product
@@ -35,6 +40,23 @@ class ProductListCreateAPIView(StaffEditorPermissionMixin, generics.ListCreateAP
 
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    # Traditional Approach =>
+    # -------------------------
+    # This function is used to customize the queryset while fetching all the products
+    # We can either use this function or we can make use of the mixin UserQuerySetMixin for the same
+    # The * and ** difference:
+    #   * => It is used to unpack a sequence (like a list or tuple) into individual positional arguments.
+    #   ** => It is used to unpack a dictionary into individual keyword arguments.
+    # def get_queryset(self, *args, **kwargs):
+    #     qs = super().get_queryset(*args, **kwargs)
+    #     # Inorder to get the user date who is hitting the request
+    #     user = self.request.user
+    #     # this code says if the incoming user is a super user he can view all the products data
+    #     # If not then the queryset filters only those products which are created by the user
+    #     if user.is_superuser:
+    #         return qs
+    #     return qs.filter(user=user)
 
 
 class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):

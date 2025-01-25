@@ -20,19 +20,27 @@ class ProductSerializer(serializers.ModelSerializer):
     # Second way to create a link field in serializer is ->
     # HyperlinkedIdentityField() takes the view_name it targets and the url params i.e is the lookup_field
     url = serializers.HyperlinkedIdentityField(
-        view_name='product-detail', lookup_field='pk',
+        view_name="product-detail",
+        lookup_field="pk",
         # lookup_url_kwarg='pkk' -> If the url params is having any other kwargs other than pk then configure it like this ->
     )
 
     # Other way of adding a custom validation is this
     # This is how we add multiple validators to a field in the serializer before saving it to DB
-    title = serializers.CharField(
-        validators=[validate_title, unique_product_title])
+    title = serializers.CharField(validators=[validate_title, unique_product_title])
 
     class Meta:
         model = Product
-        fields = ['id', 'url', 'edit_url', 'title', 'content',
-                  'price', 'sale_price', 'my_discount']
+        fields = [
+            "id",
+            "url",
+            "edit_url",
+            "title",
+            "content",
+            "price",
+            "sale_price",
+            "my_discount",
+        ]
 
     # Customized validation function for serialzier fields
     # if you need to validate the title field of a serializer before saving it to the DB
@@ -42,23 +50,26 @@ class ProductSerializer(serializers.ModelSerializer):
         # iexact means it is case insensitive
         qs = Product.objects.filter(title__iexact=value)
         if qs.exists():
-            raise serializers.ValidationError(
-                f"{value} is already a product name")
+            raise serializers.ValidationError(f"{value} is already a product name")
         return value
 
     # If you need to update any field before saving it to the database while creating or updating a record
     # customize the create or update function in the serializer
     def create(self, validated_data):
-        title = validated_data.get('title')
-        content = validated_data.get('content')
+        title = validated_data.get("title")
+        content = validated_data.get("content")
         if content is None:
-            validated_data['content'] = title
+            validated_data["content"] = title
+        request = self.context.get("request")
+        if request is None:
+            return None
+        validated_data["user"] = request.user
         return super().create(validated_data)
 
     # Customized update function
     def update(self, instance, validated_data):
-        instance.title = validated_data.get('title', instance.title)
-        instance.content = validated_data.get('content', instance.content)
+        instance.title = validated_data.get("title", instance.title)
+        instance.content = validated_data.get("content", instance.content)
 
         # If existing content is empty then
         if not instance.content:
@@ -70,7 +81,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # Now define the function that actually decides what value must be returned to the edit_url field
     def get_edit_url(self, obj):
         # this is how you access the request object in a serializer
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request is None:
             return None
         # The reverse function from rest_framework is used to target the view to which this URL must navigate to on clicking
@@ -84,7 +95,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # DRF requires the method associated with a SerializerMethodField to follow the naming pattern get_<field_name>.
     def get_my_discount(self, obj):
         # this line says if the obj returned from the Product model doesnt have an 'id' field then return None
-        if not hasattr(obj, 'id'):
+        if not hasattr(obj, "id"):
             return None
         # this line says if the obj is not an instance of the Product Model then return None
         if not isinstance(obj, Product):
