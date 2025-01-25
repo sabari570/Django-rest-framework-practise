@@ -7,7 +7,9 @@ from api.mixins import StaffEditorPermissionMixin, UserQuerySetMixin  # absolute
 
 
 # Remember to add the permission mixin before the generics API view while inheriting in the class else it wont work
-class ProductDetailAPIView(StaffEditorPermissionMixin, generics.RetrieveAPIView):
+class ProductDetailAPIView(
+    StaffEditorPermissionMixin, UserQuerySetMixin, generics.RetrieveAPIView
+):
     """
     * DetailView actually gets the detail of one single item
     """
@@ -59,7 +61,9 @@ class ProductListCreateAPIView(
     #     return qs.filter(user=user)
 
 
-class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):
+class ProductUpdateAPIView(
+    StaffEditorPermissionMixin, UserQuerySetMixin, generics.UpdateAPIView
+):
     """
     * This API is used to update a product detail by id
     """
@@ -69,7 +73,9 @@ class ProductUpdateAPIView(StaffEditorPermissionMixin, generics.UpdateAPIView):
     lookup_field = "pk"
 
 
-class ProductDeleteAPIView(StaffEditorPermissionMixin, generics.DestroyAPIView):
+class ProductDeleteAPIView(
+    StaffEditorPermissionMixin, UserQuerySetMixin, generics.DestroyAPIView
+):
     """
     * This API is used to delete a product detail by id
     """
