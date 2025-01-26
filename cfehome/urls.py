@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("api.urls")),
     path("api/products/", include("products.urls")),
+    path("api/products/search/", include("search.urls")),
     # This is where we are calling the new product urls that is created using routers
     path("api/v2/", include("cfehome.routers")),
 ]
