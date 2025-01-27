@@ -4,6 +4,7 @@
 * Command for making migrations into the database: python3 manage.py makemigrations
 * Command for migrating the changes: python3 manage.py migrate
 * Command for creating a superuser in django: python3 manage.py createsuperuser (Enter username, email and password)
+* Command to install the packages inside the requirements.txt file: pip install -r requirements.txt
 
 * Command to create a new virtual env: python -m venv env_name
 * Command to activate the created venv: source env_name/bin/activate or in windows (env_name\Scripts\activate)
