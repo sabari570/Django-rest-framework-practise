@@ -40,8 +40,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # third party packages
+    # After installing third party packages its always good to run the python3 manage.py migrate
     "rest_framework",
     "rest_framework.authtoken",
+    # this is needed to setup the cors issue
+    "corsheaders",
 
     # internal apps
     "api",
@@ -52,6 +55,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # When setting up the corsheaders add this middleware above the CommonMiddleware
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -60,6 +65,19 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "cfehome.urls"
+# Add this regex inorder to identify which api endpoint are we exposing to the clients for access
+# here we expose all those endpoints that go with {BASE_URL}/api/*
+CORS_URLS_REGEX = r"^/api/.*"
+
+# This is where we tell the project which are the origins that are allowed to access the APIs
+CORS_ALLOWED_ORIGINS = [
+    # Only request that are coming from the listed origins is allowed to access the api in PRODUCTION
+]
+if DEBUG:
+    CORS_ALLOWED_ORIGINS += [
+        # Only request that are coming from this origin is allowed to access the api in DEVELOPMENT
+        "http://localhost:5173",
+    ]
 
 TEMPLATES = [
     {
@@ -157,6 +175,7 @@ REST_FRAMEWORK = {
 # This is how we customize JWT as in saying the app about the lifespan of the access tokens provided by the api
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(seconds=30),  # mostly hours = 1
+    # mostly hours = 1
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(seconds=30),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(minutes=1),  # mostly days = 1
 }
