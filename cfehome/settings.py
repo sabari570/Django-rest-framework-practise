@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,8 +38,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # third party packages
     "rest_framework",
     "rest_framework.authtoken",
+
+    # internal apps
     "api",
     "products",
     "search",
@@ -132,6 +137,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         # Custom authentication class we created
         "api.authentication.BearerTokenAuthentication",
     ],
@@ -145,4 +151,12 @@ REST_FRAMEWORK = {
     # offset is more like from which data position we should start if we give offset to 4 it will start fetching from the 4th record and 10 records after that
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 10,
+}
+
+
+# This is how we customize JWT as in saying the app about the lifespan of the access tokens provided by the api
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ["Bearer"],
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(seconds=30),  # mostly hours = 1
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(minutes=1),  # mostly days = 1
 }
