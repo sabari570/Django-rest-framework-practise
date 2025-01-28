@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# We are changing the AUTH_USER_MODEL to our customized user model
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Application definition
 
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     "api",
     "products",
     "search",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -175,7 +178,6 @@ REST_FRAMEWORK = {
 # This is how we customize JWT as in saying the app about the lifespan of the access tokens provided by the api
 SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ["Bearer"],
-    # mostly hours = 1
-    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(seconds=30),
-    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(minutes=1),  # mostly days = 1
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=30), # mostly hours = 1
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(hours=1),  # mostly days = 1
 }
