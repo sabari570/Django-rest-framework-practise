@@ -16,3 +16,79 @@ WHILE PUSHING THE CODE TO GITHUB USE THIS COMMAND:
 	
 	=> command to pull the code from a branch using access token: 
 	git push https://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@github.com/sabari570/Django-rest-framework-practise.git <branch name>
+
+
+* Command to show migratio  history: 
+	python manage.py showmigrations
+
+* Command to fake a migration that hasnt been applied:
+	python manage.py migrate accounts --fake
+
+
+STEPS TO PERFORM WHEN YOU NEED TO MIGRATE WITHOUR DROPPING THE DATABASE:
+	* First backup the database:
+		# For SQLite
+		cp db.sqlite3 db_backup.sqlite3
+
+		# For PostgreSQL
+		pg_dump -U username -W -F t dbname > db_backup.tar
+	
+	* Create the custom user model
+	* Update the settings: 
+		AUTH_USER_MODEL = 'accounts.CustomUser'
+	* Create a migration file handler, RUN the makemigrations command if you get an error then create a migration file manually and in it:
+		filename: accounts/migrations/0002_migrate_auth_user.py
+
+			from django.db import migrations, models
+			from django.contrib.auth.hashers import make_password
+
+
+			def migrate_auth_user_to_custom_user(apps, schema_editor):
+				# Get the old and new user models
+				OldUser = apps.get_model('auth', 'User')
+				CustomUser = apps.get_model('accounts', 'CustomUser')
+
+				for old_user in OldUser.objects.all():
+					CustomUser.objects.create(
+						id=old_user.id,
+						email=old_user.email if old_user.email else f'user{old_user.id}@example.com',
+						username=old_user.username,
+						password=old_user.password,
+						is_staff=old_user.is_staff,
+						is_superuser=old_user.is_superuser,
+						is_active=old_user.is_active,
+					)
+
+
+			class Migration(migrations.Migration):
+
+				dependencies = [
+					('accounts', '0001_initial'),  # Reference your initial migration
+				]
+
+				operations = [
+					migrations.RunPython(migrate_auth_user_to_custom_user),
+				]
+
+	* Apply the migrations:
+		python manage.py makemigrations accounts
+		python manage.py migrate
+
+	* Now create the superuser again
+
+
+
+
+
+INORDER TO RESTORE THE BACKUP:
+	* Execute the following command:
+		# For SQLitecp 
+			mv db_backup.sqlite3 db.sqlite3
+		
+		# For PostgreSQL
+			pg_restore -U username -d dbname db_backup.tar
+
+		# For MYSQL
+			mysql -u username -p dbname < db_backup.sql
+
+
